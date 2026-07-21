@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Jost", "Helvetica Neue", sans-serif;
+
+  --color-ink: #0c0a09;
+  --color-onyx: #16120f;
+  --color-mocha: #241c16;
+  --color-gold: #c9a34a;
+  --color-gold-light: #e6c87d;
+  --color-cream: #f5efe6;
+  --color-sand: #b8a98f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink text-cream font-body antialiased;
+}
+
+::selection {
+  @apply bg-gold text-ink;
+}
+
+.gold-text {
+  background: linear-gradient(120deg, #e6c87d 0%, #c9a34a 45%, #f0dda4 70%, #c9a34a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hairline {
+  @apply h-px w-16 bg-gold/60;
+}
+
+input,
+textarea,
+select {
+  @apply w-full rounded-none border border-cream/15 bg-onyx px-4 py-3 text-sm text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold;
+}

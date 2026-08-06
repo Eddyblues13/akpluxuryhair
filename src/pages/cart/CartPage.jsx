@@ -3,10 +3,20 @@ import { motion } from "framer-motion";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/format";
+import { CatalogLoading } from "../../components/CatalogState";
 import ProductVisual from "../../components/ProductVisual";
 
 export default function CartPage() {
-  const { items, subtotal, updateQty, removeItem } = useCart();
+  const { items, subtotal, updateQty, removeItem, loading } = useCart();
+
+  // Lines resolve against the catalog, so wait for it before calling the bag empty.
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 md:px-8">
+        <CatalogLoading label="Loading your bag" />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

@@ -1,14 +1,14 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Gem, ShieldCheck, Truck } from "lucide-react";
-import { PRODUCTS } from "../../lib/products";
+import { featuredProducts } from "../../lib/products";
+import { useProducts } from "../../context/ProductsContext";
+import { CatalogError, CatalogLoading } from "../../components/CatalogState";
 import ProductCard from "../../components/ProductCard";
 import SectionHeading from "../../components/SectionHeading";
 
 const Hero3D = lazy(() => import("../../components/Hero3D"));
-
-const featured = PRODUCTS.filter((p) => p.badge).concat(PRODUCTS).slice(0, 4);
 
 const PROMISES = [
   {
@@ -36,6 +36,9 @@ const CATEGORY_TILES = [
 ];
 
 export default function HomePage() {
+  const { products, status, error, reload } = useProducts();
+  const featured = useMemo(() => featuredProducts(products), [products]);
+
   return (
     <>
       {/* Hero */}
@@ -49,15 +52,15 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-xs uppercase tracking-[0.35em] text-gold"
+            className="text-[11px] uppercase tracking-[0.4em] text-gold md:text-xs"
           >
-            Premium raw luxury hair
+            Premium luxury wigs
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25 }}
-            className="mt-5 max-w-3xl font-display text-4xl leading-[1.1] sm:text-6xl md:text-7xl"
+            className="display-tight mt-5 max-w-3xl font-display text-[2.6rem] font-normal leading-[1.08] sm:text-6xl md:text-7xl"
           >
             Some turn heads, <br />
             <span className="gold-text italic">ours leave a mark.</span>
@@ -68,8 +71,8 @@ export default function HomePage() {
             transition={{ duration: 0.7, delay: 0.45 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-cream/60 md:text-lg"
           >
-            Wigs, bundles and frontals crafted from raw single-donor hair — for
-            women who don't do ordinary.
+            Luxury wigs made with exceptional craftsmanship for the woman who
+            deserves nothing but the best.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -139,11 +142,16 @@ export default function HomePage() {
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-8">
-            {featured.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i} />
-            ))}
-          </div>
+          {status === "loading" && <CatalogLoading />}
+          {status === "error" && <CatalogError message={error} onRetry={reload} />}
+
+          {status === "ready" && (
+            <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-8">
+              {featured.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

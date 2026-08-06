@@ -2,18 +2,39 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Minus, Plus, ShoppingBag } from "lucide-react";
-import { getProduct, relatedProducts } from "../../lib/products";
 import { formatPrice } from "../../lib/format";
 import { useCart } from "../../context/CartContext";
+import { useProducts } from "../../context/ProductsContext";
+import { CatalogError, CatalogLoading } from "../../components/CatalogState";
 import ProductVisual from "../../components/ProductVisual";
 import ProductCard from "../../components/ProductCard";
 
 export default function ProductPage() {
   const { id } = useParams();
-  const product = getProduct(id);
+  const { getProduct, getRelated, status, error, reload } = useProducts();
   const { addItem } = useCart();
-  const [length, setLength] = useState(product?.lengths[0]);
+  // Held as null until the shopper picks, so the default follows the product
+  // once the catalog resolves.
+  const [length, setLength] = useState(null);
   const [qty, setQty] = useState(1);
+
+  const product = getProduct(id);
+
+  if (status === "loading") {
+    return (
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 md:px-8">
+        <CatalogLoading label="Loading this piece" />
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 md:px-8">
+        <CatalogError message={error} onRetry={reload} />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -26,7 +47,8 @@ export default function ProductPage() {
     );
   }
 
-  const related = relatedProducts(product);
+  const selectedLength = length ?? product.lengths[0];
+  const related = getRelated(product);
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-24 pt-28 md:px-8">
@@ -70,7 +92,7 @@ export default function ProductPage() {
                   key={l}
                   onClick={() => setLength(l)}
                   className={`border px-4 py-2 text-sm transition-colors ${
-                    length === l
+                    selectedLength === l
                       ? "border-gold bg-gold text-ink"
                       : "border-cream/20 text-cream/70 hover:border-gold hover:text-gold"
                   }`}
@@ -100,7 +122,7 @@ export default function ProductPage() {
               </button>
             </div>
             <button
-              onClick={() => addItem(product.id, length, qty)}
+              onClick={() => addItem(product.id, selectedLength, qty)}
               className="inline-flex flex-1 items-center justify-center gap-3 bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light sm:flex-none"
             >
               <ShoppingBag size={16} /> Add to bag

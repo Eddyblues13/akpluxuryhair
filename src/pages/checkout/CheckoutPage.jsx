@@ -1,17 +1,31 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Lock } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { createOrder } from "../../lib/api";
 import { formatPrice } from "../../lib/format";
-
-// Update to the store's real WhatsApp number (international format, no "+").
-const WHATSAPP_NUMBER = "2340000000000";
+import { CatalogLoading } from "../../components/CatalogState";
 
 export default function CheckoutPage() {
-  const { items, subtotal, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { items, rawItems, subtotal, clearCart, loading } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "", note: "" });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState(null);
+
+  // Checked before the empty-bag guard — the bag is cleared once the order lands.
+  if (placedOrder) {
+    return <OrderConfirmation order={placedOrder} />;
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 md:px-8">
+        <CatalogLoading label="Loading your order" />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -24,32 +38,48 @@ export default function CheckoutPage() {
     );
   }
 
-  const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    setFieldErrors((errors) => ({ ...errors, [name]: undefined }));
+  };
 
-  const placeOrder = (e) => {
+  const placeOrder = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
-    const lines = [
-      "*New order — AKP Luxury Hair*",
-      "",
-      ...items.map(
-        (i) => `• ${i.product.name} (${i.length}) x${i.qty} — ${formatPrice(i.product.price * i.qty)}`
-      ),
-      "",
-      `*Total: ${formatPrice(subtotal)}*`,
-      "",
-      `Name: ${form.name}`,
-      `Phone: ${form.phone}`,
-      `Delivery address: ${form.address}`,
-      form.note ? `Note: ${form.note}` : null,
-    ].filter(Boolean);
+    setSubmitting(true);
+    setFieldErrors({});
 
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(url, "_blank", "noopener");
+    try {
+      const order = await createOrder({
+        customer_name: form.name,
+        customer_phone: form.phone,
+        delivery_address: form.address,
+        note: form.note || null,
+        // Sent from the raw lines so nothing dropped by the catalog view is lost.
+        items: rawItems.map((i) => ({
+          product_id: i.productId,
+          length: i.length,
+          qty: i.qty,
+        })),
+      });
 
-    clearCart();
-    toast.success("Order sent! We'll confirm on WhatsApp shortly.");
-    navigate("/");
+      setPlacedOrder(order.data);
+      clearCart();
+      toast.success("Order placed — we'll be in touch shortly.");
+    } catch (error) {
+      // Map Laravel's item-level keys back onto the form fields shoppers can see.
+      setFieldErrors({
+        name: error.errors?.customer_name,
+        phone: error.errors?.customer_phone,
+        address: error.errors?.delivery_address,
+        note: error.errors?.note,
+      });
+      toast.error(error.message ?? "We couldn't place that order.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -64,40 +94,44 @@ export default function CheckoutPage() {
       <div className="hairline mt-5" />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_380px]">
-        <form onSubmit={placeOrder} className="space-y-5">
-          <div>
-            <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="name">
-              Full name
-            </label>
+        <form onSubmit={placeOrder} noValidate className="space-y-5">
+          <Field label="Full name" name="name" error={fieldErrors.name}>
             <input id="name" name="name" required value={form.name} onChange={onChange} placeholder="Adaeze Okafor" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="phone">
-              Phone (WhatsApp)
-            </label>
+          </Field>
+          <Field label="Phone (WhatsApp)" name="phone" error={fieldErrors.phone}>
             <input id="phone" name="phone" type="tel" required value={form.phone} onChange={onChange} placeholder="+234 800 000 0000" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="address">
-              Delivery address
-            </label>
+          </Field>
+          <Field label="Delivery address" name="address" error={fieldErrors.address}>
             <textarea id="address" name="address" required rows={3} value={form.address} onChange={onChange} placeholder="Street, city, state" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="note">
-              Order note <span className="normal-case tracking-normal text-cream/30">(optional)</span>
-            </label>
+          </Field>
+          <Field
+            label={
+              <>
+                Order note <span className="normal-case tracking-normal text-cream/30">(optional)</span>
+              </>
+            }
+            name="note"
+            error={fieldErrors.note}
+          >
             <textarea id="note" name="note" rows={2} value={form.note} onChange={onChange} placeholder="Anything we should know?" />
-          </div>
+          </Field>
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-3 bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light"
+            disabled={submitting}
+            className="flex w-full items-center justify-center gap-3 bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <MessageCircle size={16} /> Place order via WhatsApp
+            {submitting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" /> Placing order
+              </>
+            ) : (
+              <>
+                <Lock size={16} /> Place order
+              </>
+            )}
           </button>
           <p className="text-center text-xs text-cream/40">
-            Your order opens in WhatsApp for confirmation — payment and delivery
-            are arranged there.
+            We'll confirm your order and arrange payment and delivery by phone.
           </p>
         </form>
 
@@ -119,6 +153,61 @@ export default function CheckoutPage() {
           </div>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function Field({ label, name, error, children }) {
+  return (
+    <div>
+      <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor={name}>
+        {label}
+      </label>
+      {children}
+      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+    </div>
+  );
+}
+
+function OrderConfirmation({ order }) {
+  return (
+    <div className="mx-auto max-w-2xl px-5 pb-24 pt-40 text-center md:px-8">
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold text-gold">
+        <Check size={26} strokeWidth={1.5} />
+      </span>
+      <h1 className="mt-8 font-display text-4xl">Order received</h1>
+      <p className="mt-4 text-cream/60">
+        Thank you, {order.customer_name.split(" ")[0]}. We'll call {order.customer_phone} to
+        confirm payment and delivery.
+      </p>
+
+      <div className="mt-10 border border-cream/10 bg-onyx p-6 text-left">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <p className="text-xs uppercase tracking-[0.25em] text-cream/40">Order reference</p>
+          <p className="font-display text-lg text-gold">{order.reference}</p>
+        </div>
+        <ul className="mt-6 space-y-3 text-sm">
+          {order.items?.map((i) => (
+            <li key={`${i.product_id}-${i.length}`} className="flex justify-between gap-4 text-cream/60">
+              <span>
+                {i.name} <span className="text-cream/40">({i.length}) ×{i.qty}</span>
+              </span>
+              <span className="shrink-0">{formatPrice(i.line_total)}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 flex justify-between border-t border-cream/10 pt-4">
+          <span>Total</span>
+          <span className="text-gold">{formatPrice(order.subtotal)}</span>
+        </div>
+      </div>
+
+      <Link
+        to="/shop"
+        className="mt-10 inline-block bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light"
+      >
+        Continue shopping
+      </Link>
     </div>
   );
 }

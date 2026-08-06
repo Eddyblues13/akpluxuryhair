@@ -1,6 +1,8 @@
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { Instagram, Mail, MapPin, MessageCircle } from "lucide-react";
+import { Instagram, Loader2, Mail, MapPin, MessageCircle } from "lucide-react";
+import { sendContactMessage } from "../../lib/api";
 
 const CHANNELS = [
   {
@@ -29,10 +31,33 @@ const CHANNELS = [
 ];
 
 export default function ContactPage() {
-  const submit = (e) => {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    e.target.reset();
-    toast.success("Message sent — we'll get back to you within 24 hours.");
+    if (submitting) return;
+
+    setSubmitting(true);
+    setErrors({});
+
+    try {
+      const { message } = await sendContactMessage(form);
+      setForm({ name: "", email: "", message: "" });
+      toast.success(message ?? "Message sent — we'll get back to you within 24 hours.");
+    } catch (error) {
+      setErrors(error.errors ?? {});
+      toast.error(error.message ?? "We couldn't send that message.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -78,31 +103,60 @@ export default function ContactPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
           onSubmit={submit}
+          noValidate
           className="space-y-5 border border-cream/10 bg-onyx p-6 md:p-8"
         >
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="contact-name">
               Name
             </label>
-            <input id="contact-name" required placeholder="Your name" />
+            <input
+              id="contact-name"
+              name="name"
+              required
+              value={form.name}
+              onChange={onChange}
+              placeholder="Your name"
+            />
+            {errors.name && <p className="mt-2 text-xs text-red-400">{errors.name}</p>}
           </div>
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="contact-email">
               Email
             </label>
-            <input id="contact-email" type="email" required placeholder="you@example.com" />
+            <input
+              id="contact-email"
+              name="email"
+              type="email"
+              required
+              value={form.email}
+              onChange={onChange}
+              placeholder="you@example.com"
+            />
+            {errors.email && <p className="mt-2 text-xs text-red-400">{errors.email}</p>}
           </div>
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-cream/50" htmlFor="contact-message">
               Message
             </label>
-            <textarea id="contact-message" required rows={5} placeholder="How can we help?" />
+            <textarea
+              id="contact-message"
+              name="message"
+              required
+              rows={5}
+              value={form.message}
+              onChange={onChange}
+              placeholder="How can we help?"
+            />
+            {errors.message && <p className="mt-2 text-xs text-red-400">{errors.message}</p>}
           </div>
           <button
             type="submit"
-            className="w-full bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light"
+            disabled={submitting}
+            className="flex w-full items-center justify-center gap-3 bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Send message
+            {submitting && <Loader2 size={16} className="animate-spin" />}
+            {submitting ? "Sending" : "Send message"}
           </button>
         </motion.form>
       </div>

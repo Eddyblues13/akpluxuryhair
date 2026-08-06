@@ -1,15 +1,17 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CATEGORIES, PRODUCTS } from "../../lib/products";
+import { useProducts } from "../../context/ProductsContext";
+import { CatalogError, CatalogLoading } from "../../components/CatalogState";
 import ProductCard from "../../components/ProductCard";
 
 export default function ShopPage() {
   const [params, setParams] = useSearchParams();
+  const { products: allProducts, categories, status, error, reload } = useProducts();
   const active = params.get("category") ?? "All";
 
   const products = useMemo(
-    () => (active === "All" ? PRODUCTS : PRODUCTS.filter((p) => p.category === active)),
-    [active]
+    () => (active === "All" ? allProducts : allProducts.filter((p) => p.category === active)),
+    [active, allProducts]
   );
 
   const setCategory = (cat) =>
@@ -21,30 +23,37 @@ export default function ShopPage() {
       <h1 className="mt-3 font-display text-4xl md:text-5xl">Shop</h1>
       <div className="hairline mt-5" />
 
-      <div className="mt-10 flex flex-wrap gap-2">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setCategory(cat)}
-            className={`border px-5 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
-              active === cat
-                ? "border-gold bg-gold text-ink"
-                : "border-cream/20 text-cream/60 hover:border-gold hover:text-gold"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {status === "loading" && <CatalogLoading />}
+      {status === "error" && <CatalogError message={error} onRetry={reload} />}
 
-      <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 md:gap-8">
-        {products.map((p, i) => (
-          <ProductCard key={p.id} product={p} index={i} />
-        ))}
-      </div>
+      {status === "ready" && (
+        <>
+          <div className="mt-10 flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`border px-5 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
+                  active === cat
+                    ? "border-gold bg-gold text-ink"
+                    : "border-cream/20 text-cream/60 hover:border-gold hover:text-gold"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-      {products.length === 0 && (
-        <p className="mt-16 text-center text-cream/50">Nothing here yet — check back soon.</p>
+          <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 md:gap-8">
+            {products.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
+            ))}
+          </div>
+
+          {products.length === 0 && (
+            <p className="mt-16 text-center text-cream/50">Nothing here yet — check back soon.</p>
+          )}
+        </>
       )}
     </div>
   );

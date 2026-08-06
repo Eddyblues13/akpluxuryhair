@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Playfair Display", Georgia, serif;
+  --font-display: "Bodoni Moda", "Playfair Display", Georgia, serif;
   --font-body: "Jost", "Helvetica Neue", sans-serif;
 
   --color-ink: #0c0a09;
@@ -19,6 +19,15 @@ html {
 
 body {
   @apply bg-ink text-cream font-body antialiased;
+  /* Bodoni is an optical-size font — let the browser pick the right cut per size
+     so hairlines stay crisp at display sizes and readable at small ones. */
+  font-optical-sizing: auto;
+}
+
+/* Bodoni sets wide by default; display headlines want it pulled tighter. */
+.display-tight {
+  letter-spacing: -0.02em;
+  word-spacing: 0.02em;
 }
 
 ::selection {

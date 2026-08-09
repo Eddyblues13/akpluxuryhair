@@ -35,6 +35,12 @@ const CATEGORY_TILES = [
   { label: "Closures", to: "/shop?category=Closures", tone: ["#201812", "#3e2d1c"] },
 ];
 
+const GALLERY_IMAGES = [
+  { src: "/img1.jpeg", alt: "Balayage waves lace-front install", label: "Balayage waves" },
+  { src: "/img2.jpeg", alt: "Sleek bob lace-front install", label: "Sleek bob" },
+  { src: "/img3.jpeg", alt: "Burgundy fringe lace-front install", label: "Burgundy fringe" },
+];
+
 export default function HomePage() {
   const { products, status, error, reload } = useProducts();
   const featured = useMemo(() => featuredProducts(products), [products]);
@@ -94,6 +100,46 @@ export default function HomePage() {
               Our story
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="relative overflow-hidden bg-onyx py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-5 md:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <SectionHeading eyebrow="From the studio" title="Every install, a signature" />
+            <p className="max-w-xs text-sm leading-relaxed text-cream/40">
+              A closer look at the texture, color and finish that leaves the studio.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-4 sm:grid-cols-3 md:gap-6">
+            {GALLERY_IMAGES.map((img, i) => (
+              <motion.div
+                key={img.src}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, delay: i * 0.12 }}
+                className="group relative aspect-[3/4] overflow-hidden"
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover grayscale-[35%] transition-all duration-700 ease-out group-hover:scale-110 group-hover:grayscale-0"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
+                <div className="absolute inset-0 border border-cream/10 transition-colors duration-500 group-hover:border-gold/40" />
+                <p className="absolute left-5 top-5 text-[11px] uppercase tracking-[0.3em] text-cream/50 transition-colors duration-500 group-hover:text-gold">
+                  0{i + 1}
+                </p>
+                <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <p className="font-display text-lg italic text-cream md:text-xl">{img.label}</p>
+                  <div className="mt-2 h-px w-8 bg-gold transition-all duration-500 group-hover:w-14" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

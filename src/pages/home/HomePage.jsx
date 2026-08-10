@@ -1,7 +1,8 @@
+
 import { Suspense, lazy, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Gem, ShieldCheck, Truck } from "lucide-react";
+import { ArrowRight, BadgeCheck, Gem, ShieldCheck, Star, Truck } from "lucide-react";
 import { featuredProducts } from "../../lib/products";
 import { useProducts } from "../../context/ProductsContext";
 import { CatalogError, CatalogLoading } from "../../components/CatalogState";
@@ -36,9 +37,50 @@ const CATEGORY_TILES = [
 ];
 
 const GALLERY_IMAGES = [
-  { src: "/img1.jpeg", alt: "Balayage waves lace-front install", label: "Balayage waves" },
-  { src: "/img2.jpeg", alt: "Sleek bob lace-front install", label: "Sleek bob" },
-  { src: "/img3.jpeg", alt: "Burgundy fringe lace-front install", label: "Burgundy fringe" },
+  { src: "/samp4.jpeg", alt: "Balayage waves lace-front install" },
+  { src: "/img2.jpeg", alt: "Sleek bob lace-front install" },
+  { src: "/samp1.jpeg", alt: "Burgundy fringe lace-front install" },
+  { src: "/samp2.jpeg", alt: "Balayage waves lace-front install" },
+  { src: "/samp3.jpeg", alt: "Sleek bob lace-front install" },
+  { src: "/img3.jpeg", alt: "Burgundy fringe lace-front install" },
+];
+
+const REVIEWS = [
+  {
+    image: "/test1.jpg",
+    name: "Elohor",
+    location: "Lagos, NG",
+    rating: 5,
+    text: "Bouncy is very lovely and hardly drops.",
+  },
+  {
+    image: "/test2.jpeg",
+    name: "Temi",
+    location: "Port Harcourt, NG",
+    rating: 5,
+    text: "Curly raw texture is very nice.",
+  },
+  {
+    image: "/test3.jpeg",
+    name: "Ifeoma B.",
+    location: "Port Harcourt, NG",
+    rating: 5,
+    text: "Customer service walked me through picking the right texture for my face shape. It arrived exactly as pictured, if not better.",
+  },
+  {
+    image: "/test5.jpeg",
+    name: "Ngozi E.",
+    location: "Lagos, NG",
+    rating: 5,
+    text: "Six months of daily wear and it still bounces back after every wash. That raw hair promise is real.",
+  },
+  {
+    image: "/test6.jpeg",
+    name: "Cee",
+    location: "United States",
+    rating: 5,
+    text: "Inlove with the texture & highlight.",
+  },
 ];
 
 export default function HomePage() {
@@ -105,22 +147,24 @@ export default function HomePage() {
 
       {/* Gallery */}
       <section className="relative overflow-hidden bg-onyx py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+        <div className="relative mx-auto max-w-7xl px-5 md:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <SectionHeading eyebrow="From the studio" title="Every install, a signature" />
             <p className="max-w-xs text-sm leading-relaxed text-cream/40">
               A closer look at the texture, color and finish that leaves the studio.
             </p>
           </div>
-          <div className="mt-14 grid gap-4 sm:grid-cols-3 md:gap-6">
+          <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:gap-6">
             {GALLERY_IMAGES.map((img, i) => (
               <motion.div
                 key={img.src}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6, delay: i * 0.12 }}
-                className="group relative aspect-[3/4] overflow-hidden"
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="group relative aspect-square overflow-hidden shadow-lg shadow-black/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(201,163,74,0.35)] sm:aspect-[3/4]"
               >
                 <img
                   src={img.src}
@@ -128,15 +172,12 @@ export default function HomePage() {
                   loading="lazy"
                   className="h-full w-full object-cover grayscale-[35%] transition-all duration-700 ease-out group-hover:scale-110 group-hover:grayscale-0"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
-                <div className="absolute inset-0 border border-cream/10 transition-colors duration-500 group-hover:border-gold/40" />
-                <p className="absolute left-5 top-5 text-[11px] uppercase tracking-[0.3em] text-cream/50 transition-colors duration-500 group-hover:text-gold">
-                  0{i + 1}
-                </p>
-                <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                  <p className="font-display text-lg italic text-cream md:text-xl">{img.label}</p>
-                  <div className="mt-2 h-px w-8 bg-gold transition-all duration-500 group-hover:w-14" />
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-0" />
+                <div className="absolute inset-0 border border-cream/10 transition-colors duration-500 group-hover:border-gold/30" />
+                <span className="pointer-events-none absolute left-2.5 top-2.5 h-5 w-5 border-l border-t border-gold opacity-0 transition-all duration-500 group-hover:left-3 group-hover:top-3 group-hover:opacity-100" />
+                <span className="pointer-events-none absolute right-2.5 top-2.5 h-5 w-5 border-r border-t border-gold opacity-0 transition-all duration-500 group-hover:right-3 group-hover:top-3 group-hover:opacity-100" />
+                <span className="pointer-events-none absolute bottom-2.5 left-2.5 h-5 w-5 border-b border-l border-gold opacity-0 transition-all duration-500 group-hover:bottom-3 group-hover:left-3 group-hover:opacity-100" />
+                <span className="pointer-events-none absolute bottom-2.5 right-2.5 h-5 w-5 border-b border-r border-gold opacity-0 transition-all duration-500 group-hover:bottom-3 group-hover:right-3 group-hover:opacity-100" />
               </motion.div>
             ))}
           </div>
@@ -219,6 +260,64 @@ export default function HomePage() {
               <p className="mt-3 text-sm leading-relaxed text-cream/50">{p.text}</p>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* Reviews */}
+      <section className="relative overflow-hidden border-y border-cream/10 bg-onyx py-20 md:py-28">
+        <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+        <div className="relative mx-auto max-w-7xl px-5 md:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <SectionHeading eyebrow="Real women, real results" title="Loved by our clients" />
+            <div className="flex items-center gap-3">
+              <div className="flex text-gold">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={18} fill="currentColor" strokeWidth={0} />
+                ))}
+              </div>
+              <p className="text-sm text-cream/50">
+                <span className="font-semibold text-cream">4.9/5</span> from 500+ reviews
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-14 -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-5">
+            {REVIEWS.map((r, i) => (
+              <motion.div
+                key={r.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.55, delay: i * 0.08 }}
+                className="group relative w-[78%] flex-none snap-start border border-cream/10 bg-ink/50 p-6 transition-colors duration-500 hover:border-gold/40 sm:w-[46%] md:w-auto"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gold/30">
+                    <img
+                      src={r.image}
+                      alt={`${r.name}, verified customer`}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-sm font-semibold text-cream">
+                      <span className="truncate">{r.name}</span>
+                      <BadgeCheck size={14} className="shrink-0 text-gold" />
+                    </p>
+                    <p className="text-xs text-cream/40">{r.location}</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-0.5 text-gold">
+                  {Array.from({ length: r.rating }).map((_, s) => (
+                    <Star key={s} size={14} fill="currentColor" strokeWidth={0} />
+                  ))}
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-cream/60">&ldquo;{r.text}&rdquo;</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

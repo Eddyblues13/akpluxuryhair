@@ -37,12 +37,12 @@ const CATEGORY_TILES = [
 ];
 
 const GALLERY_IMAGES = [
-  { src: "/samp4.jpeg", alt: "Balayage waves lace-front install" },
-  { src: "/img2.jpeg", alt: "Sleek bob lace-front install" },
-  { src: "/samp1.jpeg", alt: "Burgundy fringe lace-front install" },
-  { src: "/samp2.jpeg", alt: "Balayage waves lace-front install" },
-  { src: "/samp3.jpeg", alt: "Sleek bob lace-front install" },
-  { src: "/img3.jpeg", alt: "Burgundy fringe lace-front install" },
+  { src: "/img1.PNG", alt: "Chocolate balayage curls lace-front install" },
+  { src: "/img2.PNG", alt: "Side-swept waves at a black-tie event" },
+  { src: "/img3.PNG", alt: "Wine bob with fringe lace-front install" },
+  { src: "/img4.PNG", alt: "Chocolate balayage curls lace-front install" },
+  { src: "/img5.jpg", alt: "Jet black bone-straight lace-front install" },
+  { src: "/img6.jpg", alt: "Copper ginger sleek lace-front install" },
 ];
 
 const REVIEWS = [
@@ -69,17 +69,10 @@ const REVIEWS = [
   },
   {
     image: "/test3.jpeg",
-    name: "Ifeoma B.",
+    name: "Mercy",
     location: "Port Harcourt, NG",
     rating: 5,
-    text: "Customer service walked me through picking the right texture for my face shape. It arrived exactly as pictured, if not better.",
-  },
-  {
-    image: "/test5.jpeg",
-    name: "Ngozi E.",
-    location: "Lagos, NG",
-    rating: 5,
-    text: "Six months of daily wear and it still bounces back after every wash. That raw hair promise is real.",
+    text: "Glueless curly wig is so perfect, it matches with my skin.",
   },
 ];
 
@@ -151,9 +144,9 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-5 md:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHeading eyebrow="From the studio" title="Every install, a signature" />
+            <SectionHeading eyebrow="From the collection" title="Every strand, a signature." />
             <p className="max-w-xs text-sm leading-relaxed text-cream/40">
-              A closer look at the texture, color and finish that leaves the studio.
+              A closer look at the texture, colour and finish that define AKP Luxury Hair.
             </p>
           </div>
           <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:gap-6">
@@ -282,7 +275,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-14 -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-5">
+          <div className="mt-14 -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-6 md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4">
             {REVIEWS.map((r, i) => (
               <motion.div
                 key={r.name}

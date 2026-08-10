@@ -50,21 +50,32 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
-          <Link to="/cart" className="relative p-1 text-cream/80 transition-colors hover:text-gold" aria-label="Cart">
-            <ShoppingBag size={22} strokeWidth={1.5} />
+        <div className="flex items-center gap-2">
+          <Link
+            to="/cart"
+            className="relative rounded-full border border-cream/10 p-2.5 text-cream/80 transition-all duration-300 hover:border-gold/50 hover:text-gold"
+            aria-label={count > 0 ? `Cart, ${count} items` : "Cart"}
+          >
+            <ShoppingBag size={20} strokeWidth={1.5} />
             {count > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-semibold text-ink">
+              <motion.span
+                key={count}
+                initial={{ scale: 0.4 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-semibold text-ink"
+              >
                 {count}
-              </span>
+              </motion.span>
             )}
           </Link>
           <button
-            className="p-1 text-cream/80 hover:text-gold md:hidden"
+            className="rounded-full border border-cream/10 p-2.5 text-cream/80 transition-colors hover:border-gold/50 hover:text-gold md:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
+            aria-expanded={open}
           >
-            {open ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+            {open ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
           </button>
         </div>
       </nav>
@@ -84,14 +95,21 @@ export default function Navbar() {
                   to={l.to}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    `py-3 text-sm uppercase tracking-[0.2em] ${
-                      isActive ? "text-gold" : "text-cream/70"
+                    `rounded-xl px-3 py-3 text-sm uppercase tracking-[0.2em] transition-colors ${
+                      isActive ? "bg-gold/10 text-gold" : "text-cream/70 hover:bg-cream/5"
                     }`
                   }
                 >
                   {l.label}
                 </NavLink>
               ))}
+              <Link
+                to="/cart"
+                onClick={() => setOpen(false)}
+                className="btn btn-gold mt-3 w-full"
+              >
+                <ShoppingBag size={15} /> View cart{count > 0 ? ` (${count})` : ""}
+              </Link>
             </div>
           </motion.div>
         )}

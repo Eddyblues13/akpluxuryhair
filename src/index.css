@@ -11,6 +11,29 @@
   --color-gold-light: #e6c87d;
   --color-cream: #f5efe6;
   --color-sand: #b8a98f;
+  --color-whatsapp: #25d366;
+
+  --animate-floaty: floaty 5s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.8s linear infinite;
+
+  @keyframes floaty {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 }
 
 html {
@@ -48,5 +71,112 @@ body {
 input,
 textarea,
 select {
-  @apply w-full rounded-none border border-cream/15 bg-onyx px-4 py-3 text-sm text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold;
+  @apply w-full rounded-xl border border-cream/15 bg-ink/60 px-4 py-3.5 text-sm text-cream placeholder:text-cream/30 outline-none transition-all focus:border-gold/70 focus:ring-2 focus:ring-gold/20;
+}
+
+/* Keyboard users get a visible ring everywhere without one following the mouse. */
+:focus-visible {
+  @apply outline-none ring-2 ring-gold/60 ring-offset-2 ring-offset-ink;
+}
+
+@layer components {
+  /* ---- Buttons --------------------------------------------------------- */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2.5 rounded-full px-7 py-3.5
+           text-[11px] font-semibold uppercase tracking-[0.2em] transition-all duration-300
+           disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-gold {
+    @apply bg-gold text-ink shadow-lg shadow-gold/20
+           hover:-translate-y-0.5 hover:bg-gold-light hover:shadow-xl hover:shadow-gold/30
+           active:translate-y-0 active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply border border-cream/20 text-cream/90
+           hover:-translate-y-0.5 hover:border-gold hover:text-gold active:translate-y-0;
+  }
+
+  .btn-whatsapp {
+    @apply bg-whatsapp text-ink shadow-lg shadow-whatsapp/20
+           hover:-translate-y-0.5 hover:bg-whatsapp/90 hover:shadow-xl hover:shadow-whatsapp/30
+           active:translate-y-0 active:scale-[0.98];
+  }
+
+  .btn-sm {
+    @apply gap-2 px-4 py-2.5 text-[10px] tracking-[0.15em];
+  }
+
+  /* ---- Surfaces -------------------------------------------------------- */
+  .surface {
+    @apply rounded-2xl border border-cream/10 bg-onyx/80 backdrop-blur-sm;
+  }
+
+  .surface-hover {
+    @apply transition-all duration-500 hover:border-gold/35 hover:shadow-2xl hover:shadow-black/40;
+  }
+
+  /* ---- Chips / pills --------------------------------------------------- */
+  .chip {
+    @apply inline-flex items-center justify-center rounded-full border px-4 py-2 text-xs
+           tracking-[0.15em] transition-all duration-300;
+  }
+
+  .chip-idle {
+    @apply border-cream/15 text-cream/60 hover:border-gold/60 hover:text-gold;
+  }
+
+  .chip-active {
+    @apply border-gold bg-gold text-ink shadow-md shadow-gold/25;
+  }
+
+  /* ---- Quantity stepper ------------------------------------------------ */
+  .stepper {
+    @apply flex items-center rounded-full border border-cream/15 bg-ink/60;
+  }
+
+  .stepper button {
+    @apply rounded-full p-2.5 text-cream/60 transition-colors hover:text-gold disabled:opacity-30;
+  }
+
+  /* ---- Loading skeleton ------------------------------------------------ */
+  .skeleton {
+    @apply animate-shimmer rounded-xl;
+    background-image: linear-gradient(
+      100deg,
+      rgba(245, 239, 230, 0.04) 20%,
+      rgba(245, 239, 230, 0.1) 40%,
+      rgba(245, 239, 230, 0.04) 60%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Keeps sticky mobile action bars clear of the iOS home indicator. */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

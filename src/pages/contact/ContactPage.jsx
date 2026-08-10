@@ -3,13 +3,14 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Instagram, Loader2, Mail, MapPin, MessageCircle } from "lucide-react";
 import { sendContactMessage } from "../../lib/api";
+import { WHATSAPP_DISPLAY, whatsappLink } from "../../lib/whatsapp";
 
 const CHANNELS = [
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "+234 800 000 0000",
-    href: "https://wa.me/2340000000000",
+    value: WHATSAPP_DISPLAY,
+    href: whatsappLink("Hi AKP Luxury Hair 👋"),
   },
   {
     icon: Instagram,

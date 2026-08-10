@@ -75,6 +75,9 @@ export const updateProduct = (slug, body) => request(`/products/${slug}`, { meth
 export const deleteProduct = (slug) => request(`/products/${slug}`, { method: "DELETE" });
 export const toggleProduct = (slug) => request(`/products/${slug}/toggle`, { method: "PATCH" });
 
+/* uploads */
+export const createUploadSignature = () => request("/uploads/signature", { method: "POST" });
+
 /* orders */
 export const fetchAdminOrders = (params, signal) => request("/orders", { params, signal });
 export const fetchAdminOrder = (id, signal) => request(`/orders/${id}`, { signal });

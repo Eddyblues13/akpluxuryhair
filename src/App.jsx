@@ -2,6 +2,7 @@ import { Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import WhatsAppFab from "./components/WhatsAppFab";
 import HomePage from "./pages/home/HomePage";
 import ShopPage from "./pages/shop/ShopPage";
 import ProductPage from "./pages/product/ProductPage";
@@ -30,6 +31,7 @@ function StorefrontLayout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppFab />
     </div>
   );
 }

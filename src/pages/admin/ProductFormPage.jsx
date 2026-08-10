@@ -13,6 +13,7 @@ import {
   PrimaryButton,
   Spinner,
 } from "../../components/admin/ui";
+import ImageUploader from "../../components/admin/ImageUploader";
 
 const BLANK = {
   name: "",
@@ -224,14 +225,14 @@ function ProductForm({ slug, isEdit, initial }) {
                 />
               </Field>
               <Field
-                label="Image URL"
+                label="Product image"
                 error={errors.image}
-                hint="Optional. Without one, the storefront draws the tone gradient below."
+                hint="Optional. Stored in Cloudinary. Without one, the storefront draws the tone gradient below."
               >
-                <input
+                <ImageUploader
                   value={form.image}
-                  onChange={(e) => set({ image: e.target.value })}
-                  placeholder="https://…"
+                  onChange={(image) => set({ image })}
+                  disabled={saving}
                 />
               </Field>
             </div>

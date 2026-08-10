@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BadgeCheck, Gem, ShieldCheck, Star, Truck } from "lucide-react";
 import { featuredProducts } from "../../lib/products";
 import { useProducts } from "../../context/ProductsContext";
-import { CatalogError, CatalogLoading } from "../../components/CatalogState";
+import { CatalogError, CatalogSkeleton } from "../../components/CatalogState";
 import ProductCard from "../../components/ProductCard";
 import SectionHeading from "../../components/SectionHeading";
 
@@ -34,15 +34,6 @@ const CATEGORY_TILES = [
   { label: "Bundles", to: "/shop?category=Bundles", tone: ["#181210", "#33241a"] },
   { label: "Frontals", to: "/shop?category=Frontals", tone: ["#221a12", "#463019"] },
   { label: "Closures", to: "/shop?category=Closures", tone: ["#201812", "#3e2d1c"] },
-];
-
-const GALLERY_IMAGES = [
-  { src: "/img1.PNG", alt: "Chocolate balayage curls lace-front install" },
-  { src: "/img2.PNG", alt: "Side-swept waves at a black-tie event" },
-  { src: "/img3.PNG", alt: "Wine bob with fringe lace-front install" },
-  { src: "/img4.PNG", alt: "Chocolate balayage curls lace-front install" },
-  { src: "/img5.jpg", alt: "Jet black bone-straight lace-front install" },
-  { src: "/img6.jpg", alt: "Copper ginger sleek lace-front install" },
 ];
 
 const REVIEWS = [
@@ -78,7 +69,8 @@ const REVIEWS = [
 
 export default function HomePage() {
   const { products, status, error, reload } = useProducts();
-  const featured = useMemo(() => featuredProducts(products), [products]);
+  // Badged pieces lead, then the rest of the catalog fills the grid out.
+  const showcase = useMemo(() => featuredProducts(products, 6), [products]);
 
   return (
     <>
@@ -121,24 +113,18 @@ export default function HomePage() {
             transition={{ duration: 0.7, delay: 0.6 }}
             className="mt-10 flex flex-wrap items-center gap-4"
           >
-            <Link
-              to="/shop"
-              className="group inline-flex items-center gap-3 bg-gold px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light"
-            >
+            <Link to="/shop" className="btn btn-gold group">
               Shop the collection
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link
-              to="/about"
-              className="inline-flex items-center gap-3 border border-cream/25 px-8 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-cream transition-colors hover:border-gold hover:text-gold"
-            >
+            <Link to="/about" className="btn btn-outline">
               Our story
             </Link>
           </motion.div>
         </div>
       </section>
 
-      {/* Gallery */}
+      {/* Collection showcase */}
       <section className="relative overflow-hidden bg-onyx py-20 md:py-28">
         <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
@@ -149,31 +135,30 @@ export default function HomePage() {
               A closer look at the texture, colour and finish that define AKP Luxury Hair.
             </p>
           </div>
-          <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:gap-6">
-            {GALLERY_IMAGES.map((img, i) => (
-              <motion.div
-                key={img.src}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative aspect-square overflow-hidden shadow-lg shadow-black/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(201,163,74,0.35)] sm:aspect-[3/4]"
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  loading="lazy"
-                  className="h-full w-full object-cover grayscale-[35%] transition-all duration-700 ease-out group-hover:scale-110 group-hover:grayscale-0"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-0" />
-                <div className="absolute inset-0 border border-cream/10 transition-colors duration-500 group-hover:border-gold/30" />
-                <span className="pointer-events-none absolute left-2.5 top-2.5 h-5 w-5 border-l border-t border-gold opacity-0 transition-all duration-500 group-hover:left-3 group-hover:top-3 group-hover:opacity-100" />
-                <span className="pointer-events-none absolute right-2.5 top-2.5 h-5 w-5 border-r border-t border-gold opacity-0 transition-all duration-500 group-hover:right-3 group-hover:top-3 group-hover:opacity-100" />
-                <span className="pointer-events-none absolute bottom-2.5 left-2.5 h-5 w-5 border-b border-l border-gold opacity-0 transition-all duration-500 group-hover:bottom-3 group-hover:left-3 group-hover:opacity-100" />
-                <span className="pointer-events-none absolute bottom-2.5 right-2.5 h-5 w-5 border-b border-r border-gold opacity-0 transition-all duration-500 group-hover:bottom-3 group-hover:right-3 group-hover:opacity-100" />
-              </motion.div>
-            ))}
-          </div>
+          {status === "loading" && <CatalogSkeleton count={6} className="mt-14" />}
+          {status === "error" && <CatalogError message={error} onRetry={reload} />}
+
+          {status === "ready" && (
+            <>
+              <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6">
+                {showcase.map((p, i) => (
+                  <ProductCard key={p.id} product={p} index={i} />
+                ))}
+              </div>
+
+              {products.length > showcase.length && (
+                <div className="mt-12 flex justify-center">
+                  <Link to="/shop" className="btn btn-gold group">
+                    See all {products.length} pieces
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </Link>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 
@@ -206,32 +191,6 @@ export default function HomePage() {
               </Link>
             </motion.div>
           ))}
-        </div>
-      </section>
-
-      {/* Featured */}
-      <section className="border-y border-cream/10 bg-onyx">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHeading eyebrow="Curated for you" title="Featured pieces" />
-            <Link
-              to="/shop"
-              className="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold"
-            >
-              View all
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-          {status === "loading" && <CatalogLoading />}
-          {status === "error" && <CatalogError message={error} onRetry={reload} />}
-
-          {status === "ready" && (
-            <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-8">
-              {featured.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
@@ -326,10 +285,7 @@ export default function HomePage() {
           >
             Your signature look is <span className="gold-text italic">one order away.</span>
           </motion.h2>
-          <Link
-            to="/shop"
-            className="mt-10 inline-flex items-center gap-3 bg-gold px-10 py-4 text-xs font-semibold uppercase tracking-[0.25em] text-ink transition-colors hover:bg-gold-light"
-          >
+          <Link to="/shop" className="btn btn-gold mt-10 px-10">
             Shop now <ArrowRight size={16} />
           </Link>
         </div>

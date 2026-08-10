@@ -15,14 +15,20 @@ createRoot(document.getElementById("root")).render(
         <ProductsProvider>
           <CartProvider>
             <App />
+            {/* Top-center keeps toasts clear of the sticky buy bar and the
+                WhatsApp button that sit along the bottom edge. */}
             <Toaster
-              position="bottom-center"
+              position="top-center"
+              containerStyle={{ top: 88 }}
               toastOptions={{
                 style: {
-                  background: "#16120f",
+                  background: "rgba(22,18,15,0.95)",
                   color: "#f5efe6",
                   border: "1px solid rgba(201,163,74,0.4)",
-                  borderRadius: 0,
+                  borderRadius: "9999px",
+                  padding: "10px 18px",
+                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 18px 40px -12px rgba(0,0,0,0.6)",
                   fontFamily: "Jost, sans-serif",
                   fontSize: "14px",
                 },

@@ -1,13 +1,32 @@
-// Elegant placeholder visual used until real product photography is added.
-// Drop an `image` field on a product in lib/products.js to replace it.
-export default function ProductVisual({ product, className = "" }) {
+import { optimizedUrl, srcSetFor } from "../lib/cloudinary";
+
+/**
+ * Renders product photography when there is any, and an elegant tone-gradient
+ * placeholder when there isn't. Cloudinary-hosted images are served through
+ * `f_auto,q_auto` at a width the browser picks; anything else is passed
+ * through untouched.
+ *
+ * `sizes` should describe the slot the image occupies — the default matches
+ * the shop grid (two-up on phones, four-up on desktop).
+ */
+export default function ProductVisual({
+  product,
+  className = "",
+  sizes = "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw",
+  width = 900,
+  priority = false,
+}) {
   const [from, to] = product.tone;
 
   if (product.image) {
     return (
       <img
-        src={product.image}
+        src={optimizedUrl(product.image, { width })}
+        srcSet={srcSetFor(product.image)}
+        sizes={sizes}
         alt={product.name}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
         className={`h-full w-full object-cover ${className}`}
       />
     );

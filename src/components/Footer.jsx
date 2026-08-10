@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Instagram, MessageCircle, Mail } from "lucide-react";
+import { Instagram, Lock, MessageCircle, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+import { whatsappLink } from "../lib/whatsapp";
 
 export default function Footer() {
   const subscribe = (e) => {
@@ -24,7 +25,7 @@ export default function Footer() {
             <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="transition-colors hover:text-gold">
               <Instagram size={20} strokeWidth={1.5} />
             </a>
-            <a href="https://wa.me/2340000000000" target="_blank" rel="noreferrer" aria-label="WhatsApp" className="transition-colors hover:text-gold">
+            <a href={whatsappLink()} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="transition-colors hover:text-gold">
               <MessageCircle size={20} strokeWidth={1.5} />
             </a>
             <a href="mailto:hello@akpluxuryhair.com" aria-label="Email" className="transition-colors hover:text-gold">
@@ -61,8 +62,14 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-cream/10 py-5 text-center text-xs tracking-wide text-cream/40">
-        © {new Date().getFullYear()} AKP Luxury Hair. All rights reserved.
+      <div className="flex flex-col items-center justify-between gap-3 border-t border-cream/10 px-5 py-5 text-xs tracking-wide text-cream/40 sm:flex-row md:px-8">
+        <p>© {new Date().getFullYear()} AKP Luxury Hair. All rights reserved.</p>
+        <Link
+          to="/admin/login"
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-gold"
+        >
+          <Lock size={11} /> Staff login
+        </Link>
       </div>
     </footer>
   );

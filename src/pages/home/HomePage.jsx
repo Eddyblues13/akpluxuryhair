@@ -47,6 +47,13 @@ const GALLERY_IMAGES = [
 
 const REVIEWS = [
   {
+    image: "/test6.jpeg",
+    name: "Cee",
+    location: "United States",
+    rating: 5,
+    text: "Inlove with the texture & highlight.",
+  },
+  {
     image: "/test1.jpg",
     name: "Elohor",
     location: "Lagos, NG",
@@ -73,13 +80,6 @@ const REVIEWS = [
     location: "Lagos, NG",
     rating: 5,
     text: "Six months of daily wear and it still bounces back after every wash. That raw hair promise is real.",
-  },
-  {
-    image: "/test6.jpeg",
-    name: "Cee",
-    location: "United States",
-    rating: 5,
-    text: "Inlove with the texture & highlight.",
   },
 ];
 
@@ -277,7 +277,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-sm text-cream/50">
-                <span className="font-semibold text-cream">4.9/5</span> from 500+ reviews
+                <span className="font-semibold text-cream">4.9/5</span> from numerous reviews
               </p>
             </div>
           </div>
